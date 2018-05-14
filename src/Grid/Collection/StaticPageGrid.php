@@ -1,10 +1,9 @@
 <?php namespace Yorki\Workshop\Grid\Collection;
 
-use App\Library\Grid\Grid;
-use App\Library\Grid\GridRenderer;
-use App\Managers\Contracts\ChatManagerContract;
-use App\Managers\Contracts\LinkManagerContract;
-use Carbon\Carbon;
+use Yorki\Workshop\Grid\Grid;
+use Yorki\Workshop\Grid\GridRenderer;
+use \App\Managers\Contracts\LinkManagerContract;
+use \Carbon\Carbon;
 
 class StaticPageGrid
 {
