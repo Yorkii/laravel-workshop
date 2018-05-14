@@ -19,5 +19,9 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->app->singleton('command.workshop.model', function ($app) {
             return new WorkshopModel($app['files']);
         });
+
+
+        $this->commands('command.workshop.admin');
+        $this->commands('command.workshop.model');
     }
 }
