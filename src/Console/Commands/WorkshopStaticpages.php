@@ -43,7 +43,7 @@ class WorkshopStaticpages extends WorkshopCommand
         $this->files->copy(__DIR__ . '/Stubs/Models/StaticPage.php', base_path('app/Models/StaticPage.php'));
         $this->call('make:repository', [
             'model' => 'StaticPage',
-            '--model-namespace' => 'App\Repositories',
+            '--model-namespace' => 'App\Models',
         ]);
 
         $this->copyManager('LinkManager');

@@ -32,7 +32,7 @@ class WorkshopCommand extends Command
             $tmp = mb_substr($web, 0, $adminRoutesPos);
             $adminRoutesPos = mb_strrpos($tmp, '/');
             $tmp = mb_substr($web, 0, $adminRoutesPos);
-            $tmp .= PHP_EOL . $this->files->get($filePath);
+            $tmp .= $this->files->get($filePath) . PHP_EOL . PHP_EOL;
             $tmp .= mb_substr($web, $adminRoutesPos);
 
             $this->files->put(base_path('routes/web.php'), $tmp);
