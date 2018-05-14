@@ -1,0 +1,12 @@
+    $this->group([
+        'prefix' => 'general',
+    ], function () {
+        $this->get('settings', 'GeneralController::class@settings')
+            ->name('admin.general.settings');
+
+        $this->post('update', 'GeneralController::class@update')
+            ->name('admin.general.update');
+
+        $this->post('rebuild', 'GeneralController::class@rebuild')
+            ->name('admin.general.rebuild');
+    });

@@ -93,6 +93,10 @@ class WorkshopCommand extends Command
             return;
         }
 
+        if (!file_exists(base_path('app/Managers/Contracts'))) {
+            $this->files->makeDirectory(base_path('app/Managers/Contracts'), 0755, true);
+        }
+
         $this->files->copy(__DIR__ . '/Stubs/Managers/Contracts/' . $className . 'Contract.php', base_path('app/Managers/Contracts/' . $className . 'Contract.php'));
         $this->files->copy(__DIR__ . '/Stubs/Managers/' . $className . '.php', base_path('app/Managers/' . $className . '.php'));
 

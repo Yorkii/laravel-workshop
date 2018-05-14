@@ -1,0 +1,66 @@
+<?php namespace App\Http\Controllers\Admin;
+
+use Yorki\Workshop\Settings\SettingsForm;
+use App\Managers\Contracts\LinkManagerContract;
+use App\Managers\Contracts\SettingManagerContract;
+use Illuminate\Http\Request;
+use Cache;
+
+class GeneralController extends AdminController
+{
+    /**
+     * @param SettingManagerContract $settingManager
+     * @param LinkManagerContract $linkManager
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function settings(
+        SettingManagerContract $settingManager,
+        LinkManagerContract $linkManager
+    ) {
+        $settingsForm = new SettingsForm();
+        $settingsForm->setAction(route('admin.general.update'))
+            ->setStyle('warning')
+            ->setSubmitCaption('Save settings');
+
+        $settingsForm->addSetting('general[analytics_id]', 'Universal analytics ID', 'string', $settingManager->getSettingValue('general', 'analytics_id', ''));
+        $settingsForm->addSetting('general[js_debug]', 'Javascript debug mode', 'boolean', $settingManager->getSettingValue('general', 'js_debug'));
+
+        return view('admin.general.settings', [
+            'linkManager' => $linkManager,
+            'settings' => $settingManager,
+            'settingsForm' => $settingsForm,
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param SettingManagerContract $settingManager
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update(
+        Request $request,
+        SettingManagerContract $settingManager
+    ) {
+        $settings = $request->input('general');
+
+        foreach ($settings as $key => $value) {
+            $settingManager->setSettingValue('general', $key, $value);
+        }
+
+        return redirect(route('admin.general.settings'));
+    }
+
+    /**
+     * @param JackpotManagerContract $jackpotManager
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function rebuild()
+    {
+        Cache::forever('build_version', str_random(8));
+
+        return redirect(route('admin.general.settings'));
+    }
+}
