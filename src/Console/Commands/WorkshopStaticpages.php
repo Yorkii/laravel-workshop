@@ -29,7 +29,7 @@ class WorkshopStaticpages extends WorkshopCommand
             }
         }
 
-        $this->files->copy(__DIR__ . '/database/migrations/2017_12_09_070127_create_static_page_table.php', base_path('database/migrations/2017_12_09_070127_create_static_page_table.php'));
+        $this->files->copy(__DIR__ . '/Stubs/database/migrations/2017_12_09_070127_create_static_page_table.php', base_path('database/migrations/2017_12_09_070127_create_static_page_table.php'));
         $this->call('migrate');
 
         $this->copyAdminViews('static', [
