@@ -38,7 +38,7 @@ class WorkshopAdmin extends Command
 
         $paths = [
             base_path('resources/views/layouts'),
-            base_path('resources/views/admin'),
+            base_path('resources/views/admin/users'),
             base_path('resources/views/widgets'),
             base_path('app/Http/Controllers/Admin'),
             base_path('app/Widgets'),
@@ -52,8 +52,11 @@ class WorkshopAdmin extends Command
 
         $this->files->copy(__DIR__ . '/Stubs/views/layouts/admin.blade.php', base_path('resources/views/layouts/admin.blade.php'));
         $this->files->copy(__DIR__ . '/Stubs/views/admin/dashboard.blade.php', base_path('resources/views/admin/dashboard.blade.php'));
-        $this->files->copy(__DIR__ . '/Stubs/AdminController.stub', base_path('app/Http/Controllers/Admin/AdminController.php'));
-        $this->files->copy(__DIR__ . '/Stubs/IndexController.stub', base_path('app/Http/Controllers/Admin/IndexController.php'));
+        $this->files->copy(__DIR__ . '/Stubs/views/admin/users/index.blade.php', base_path('resources/views/admin/users/index.blade.php'));
+        $this->files->copy(__DIR__ . '/Stubs/views/admin/users/single.blade.php', base_path('resources/views/admin/users/single.blade.php'));
+        $this->files->copy(__DIR__ . '/Stubs/Controllers/AdminController.stub', base_path('app/Http/Controllers/Admin/AdminController.php'));
+        $this->files->copy(__DIR__ . '/Stubs/Controllers/IndexController.stub', base_path('app/Http/Controllers/Admin/IndexController.php'));
+        $this->files->copy(__DIR__ . '/Stubs/Controllers/UserController.stub', base_path('app/Http/Controllers/Admin/UserController.php'));
         $this->files->copy(__DIR__ . '/Stubs/Widgets/AdminSidebar.stub', base_path('app/Widgets/AdminSidebar.php'));
         $this->files->copy(__DIR__ . '/Stubs/views/widgets/admin_sidebar.blade.php', base_path('resources/views/widgets/admin_sidebar.blade.php'));
         $this->files->copy(__DIR__ . '/Stubs/Widgets/AdminHeader.stub', base_path('app/Widgets/AdminHeader.php'));
@@ -66,7 +69,7 @@ class WorkshopAdmin extends Command
             $this->files->put(base_path('routes/web.php'), $web);
         }
 
-        $this->addLinkToSidebar('/users', 'Users');
+        $this->addLinkToSidebar('/admin/users', 'Users');
 
         $adminLTEPath = storage_path('admin-lte-2.4.3.zip');
         $this->downloadAdminLTE($adminLTEPath);
@@ -183,7 +186,7 @@ class WorkshopAdmin extends Command
      */
     protected function addLinkToSidebar($link, $caption)
     {
-        $sidebar = $this->files->get(base_path('resources/views/admin/sidebar.blade.php'));
+        $sidebar = $this->files->get(base_path('resources/views/widgets/admin_sidebar.blade.php'));
         $links = mb_strpos($sidebar, '<!--[@MENU-LINKS@]-->');
 
         if ($links === false) {
@@ -194,6 +197,6 @@ class WorkshopAdmin extends Command
         $tmp .= '<li><a href="' . $link . '"><i class="fa fa-dashboard"></i> <span>' . $caption . '</span></a></li>' . PHP_EOL;
         $tmp .= mb_substr($sidebar, $links);
 
-        $this->files->put(base_path('resources/views/admin/sidebar.blade.php'), $tmp);
+        $this->files->put(base_path('resources/views/widgets/admin_sidebar.blade.php'), $tmp);
     }
 }

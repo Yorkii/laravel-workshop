@@ -5,5 +5,16 @@ Route::group([
 ], function () {
     $this->get('/', 'IndexController@index')->name('admin');
 
+    $this->group([
+        'prefix' => 'user',
+    ], function () {
+        $this->get('/', 'UserController@index')
+            ->name('admin.users');
+
+        $this->get('/show/{id}', 'UserController@single')
+            ->where('id', '[0-9]+')
+            ->name('admin.users.single');
+    });
+
     /* [@Admin-Routes@] */
 });
