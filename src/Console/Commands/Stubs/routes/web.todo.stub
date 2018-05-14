@@ -1,0 +1,37 @@
+    $this->group([
+        'prefix' => 'todo',
+    ], function () {
+        $this->get('/', 'TodoController@index')
+            ->name('admin.todo');
+
+        $this->get('show/{id}', 'TodoController@single')
+            ->where('id', '[0-9]+')
+            ->name('admin.todo.single');
+
+        $this->post('create', 'TodoController@create')
+            ->name('admin.todo.create');
+
+        $this->post('done/{id}', 'TodoController@done')
+            ->where('id', '[0-9]+')
+            ->name('admin.todo.done');
+
+        $this->post('undone/{id}', 'TodoController@undone')
+            ->where('id', '[0-9]+')
+            ->name('admin.todo.undone');
+
+        $this->post('skip/{id}', 'TodoController@skip')
+            ->where('id', '[0-9]+')
+            ->name('admin.todo.skip');
+
+        $this->post('priority/{id}', 'TodoController@priority')
+            ->where('id', '[0-9]+')
+            ->name('admin.todo.priority');
+
+        $this->post('comment/{id}', 'TodoController@comment')
+            ->where('id', '[0-9]+')
+            ->name('admin.todo.comment');
+
+        $this->post('comment/remove/{id}', 'TodoController@commentRemove')
+            ->where('id', '[0-9]+')
+            ->name('admin.todo.comment.remove');
+    });

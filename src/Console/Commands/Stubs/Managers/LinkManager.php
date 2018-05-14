@@ -129,17 +129,9 @@ class LinkManager extends Manager implements LinkManagerContract
     {
         $translations = [
             'auth',
-            'backpack',
-            'chat',
-            'daily',
-            'jackpot',
-            'menu',
             'pagination',
             'passwords',
             'validation',
-            'tutorial',
-            'user',
-            'footer',
         ];
         $result = [];
 

@@ -4,6 +4,7 @@ use Yorki\Workshop\Console\Commands\WorkshopAdmin;
 use Yorki\Workshop\Console\Commands\WorkshopModel;
 use Yorki\Workshop\Console\Commands\WorkshopSettings;
 use Yorki\Workshop\Console\Commands\WorkshopStaticpages;
+use Yorki\Workshop\Console\Commands\WorkshopTodo;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -30,9 +31,14 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             return new WorkshopSettings($app['files']);
         });
 
+        $this->app->singleton('command.workshop.todo', function ($app) {
+            return new WorkshopTodo($app['files']);
+        });
+
         $this->commands('command.workshop.admin');
         $this->commands('command.workshop.model');
         $this->commands('command.workshop.static-pages');
         $this->commands('command.workshop.settings');
+        $this->commands('command.workshop.todo');
     }
 }

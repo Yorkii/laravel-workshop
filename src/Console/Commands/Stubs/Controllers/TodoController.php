@@ -1,0 +1,310 @@
+<?php namespace App\Http\Controllers\Admin;
+
+use Yorki\Workshop\Grid\Collection\TodoGrid;
+use App\Managers\Contracts\LinkManagerContract;
+use App\Repositories\Contracts\TodoCommentRepositoryContract;
+use App\Repositories\Contracts\TodoRepositoryContract;
+use Illuminate\Http\Request;
+use App\User;
+use Auth;
+
+class TodoController extends AdminController
+{
+    /**
+     * @param TodoRepositoryContract $todoRepository
+     * @param LinkManagerContract $linkManager
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index(
+        TodoRepositoryContract $todoRepository,
+        TodoCommentRepositoryContract $todoCommentRepository,
+        LinkManagerContract $linkManager
+    ) {
+        $todos = $todoRepository->getModel()
+            ->where('status', Todo::STATUS_NEW)
+            ->orderBy('priority', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->toArray();
+
+        foreach ($todos as &$todo) {
+            $todo['comments_count'] = $todoCommentRepository->getModel()
+                ->where('todo_id', $todo['id'])
+                ->count();
+        }
+
+        $todoGrid = new TodoGrid();
+        $todoGrid->setItems($todos);
+        $todoGrid->getGrid()
+            ->makeHidden([
+                'status',
+                'done_by',
+                'done_at',
+            ])
+            ->setEmptyText('Great, list is empty! Everything is under full control!');
+
+        $done = $todoRepository->getModel()
+            ->whereIn('status', [
+                Todo::STATUS_DONE,
+                Todo::STATUS_SKIPPED
+            ])
+            ->orderBy('done_at', 'DESC')
+            ->get()
+            ->toArray();
+
+        foreach ($done as &$todo) {
+            $todo['comments_count'] = $todoCommentRepository->getModel()
+                ->where('todo_id', $todo['id'])
+                ->count();
+        }
+
+        $doneGrid = new TodoGrid();
+        $doneGrid->setItems($done);
+        $doneGrid->getGrid()
+            ->makeHidden([
+                'priority',
+            ])
+            ->setEmptyText('List is empty! Get your shit together and start working!');
+
+        return view('admin.todo.index', [
+            'todoGrid' => $todoGrid,
+            'doneGrid' => $doneGrid,
+            'todoCount' => count($todos),
+            'todoCountDone' => count($done),
+            'linkManager' => $linkManager,
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param TodoRepositoryContract $todoRepository
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function create(
+        Request $request,
+        TodoRepositoryContract $todoRepository
+    ) {
+        $todoRepository->create([
+            'status' => Todo::STATUS_NEW,
+            'priority' => $request->input('priority'),
+            'category' => $request->input('category'),
+            'user_id' => Auth::user()->id,
+            'text' => (string) $request->input('text'),
+            'title' => (string) $request->input('title'),
+        ]);
+
+        return redirect(route('admin.todo'));
+    }
+
+    /**
+     * @param TodoRepositoryContract $todoRepository
+     * @param $todoId
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function done(
+        TodoRepositoryContract $todoRepository,
+        $todoId
+    ) {
+        $todo = $todoRepository->find($todoId);
+
+        if (null === $todo) {
+            return redirect(route('admin.todo'));
+        }
+
+        $todoRepository->update($todoId, [
+            'status' => Todo::STATUS_DONE,
+            'done_at' => new Carbon('now'),
+            'done_by' => Auth::user()->id,
+        ]);
+
+        return redirect(route('admin.todo'));
+    }
+
+    /**
+     * @param TodoRepositoryContract $todoRepository
+     * @param $todoId
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function undone(
+        TodoRepositoryContract $todoRepository,
+        $todoId
+    ) {
+        $todo = $todoRepository->find($todoId);
+
+        if (null === $todo) {
+            return redirect(route('admin.todo'));
+        }
+
+        $todoRepository->update($todoId, [
+            'status' => Todo::STATUS_NEW,
+            'done_at' => null,
+            'done_by' => null,
+        ]);
+
+        return redirect(route('admin.todo'));
+    }
+
+    /**
+     * @param TodoRepositoryContract $todoRepository
+     * @param $todoId
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function skip(
+        TodoRepositoryContract $todoRepository,
+        $todoId
+    ) {
+        $todo = $todoRepository->find($todoId);
+
+        if (null === $todo) {
+            return redirect(route('admin.todo'));
+        }
+
+        $todoRepository->update($todoId, [
+            'status' => Todo::STATUS_SKIPPED,
+            'done_at' => new Carbon('now'),
+            'done_by' => Auth::user()->id,
+        ]);
+
+        return redirect(route('admin.todo'));
+    }
+
+    /**
+     * @param Request $request
+     * @param TodoRepositoryContract $todoRepository
+     * @param $todoId
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function priority(
+        Request $request,
+        TodoRepositoryContract $todoRepository,
+        $todoId
+    ) {
+        $todo = $todoRepository->find($todoId);
+
+        if (null === $todo) {
+            return redirect(route('admin.todo'));
+        }
+
+        $todoRepository->update($todoId, [
+            'priority' => $request->input('priority'),
+        ]);
+
+        return redirect(route('admin.todo'));
+    }
+
+    /**
+     * @param TodoRepositoryContract $todoRepository
+     * @param TodoCommentRepositoryContract $todoCommentRepository
+     * @param LinkManagerContract $linkManager
+     * @param int $todoId
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     */
+    public function single(
+        TodoRepositoryContract $todoRepository,
+        TodoCommentRepositoryContract $todoCommentRepository,
+        LinkManagerContract $linkManager,
+        $todoId
+    ) {
+        $todo = $todoRepository->find($todoId);
+
+        if (null === $todo) {
+            return redirect(route('admin.todo'));
+        }
+
+        $comments = $todoCommentRepository->getModel()
+            ->where('todo_id', $todo->id)
+            ->orderBy('id', 'ASC')
+            ->get()
+            ->toArray();
+
+        foreach ($comments as &$comment) {
+            $comment['user'] = User::find($comment['user_id'])->toArray();
+
+            $time = strtotime($comment['created_at']);
+            $ago = date('H:i:s', $time);
+
+            if ($time === time()) {
+                $ago = 'Just now';
+            } elseif ($time > time() - 60) {
+                $ago = (time() - $time) . ' sec ago';
+            } elseif ($time > time() - 3600) {
+                $ago = floor((time() - $time) / 60) . ' min ago';
+            } elseif ($time > time() - 86400) {
+                $ago = floor((time() - $time) / 3600) . ' hours ago';
+            }
+
+            $comment['ago'] = $ago;
+            $comment['comment'] = $linkManager->wrapLinks($comment['comment']);
+        }
+
+        return view('admin.todo.single', [
+            'todo' => $todo,
+            'comments' => $comments,
+            'linkManager' => $linkManager,
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param TodoRepositoryContract $todoRepository
+     * @param TodoCommentRepositoryContract $todoCommentRepository
+     * @param $todoId
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function comment(
+        Request $request,
+        TodoRepositoryContract $todoRepository,
+        TodoCommentRepositoryContract $todoCommentRepository,
+        $todoId
+    ) {
+        $todo = $todoRepository->find($todoId);
+        $comment = trim($request->input('comment'));
+
+        if (null === $todo) {
+            return redirect(route('admin.todo'));
+        }
+
+        if (empty($comment)) {
+            return redirect(route('admin.todo.single', ['id' => $todo->id]));
+        }
+
+        $todoCommentRepository->create([
+            'todo_id' => $todo->id,
+            'user_id' => Auth::user()->id,
+            'comment' => $comment,
+        ]);
+
+        return redirect(route('admin.todo.single', ['id' => $todo->id]));
+    }
+
+    /**
+     * @param TodoCommentRepositoryContract $todoCommentRepository
+     * @param int $commentId
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function commentRemove(
+        TodoCommentRepositoryContract $todoCommentRepository,
+        $commentId
+    ) {
+        $comment = $todoCommentRepository->find($commentId);
+
+        if (null === $comment) {
+            return redirect(route('admin.todo'));
+        }
+
+        if ($comment->user_id == Auth::user()->id) {
+            $todoCommentRepository->delete($commentId);
+        }
+
+        return redirect(route('admin.todo.single', ['id' => $comment->todo_id]));
+    }
+}

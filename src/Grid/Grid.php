@@ -18,6 +18,11 @@ class Grid
     protected $tableClass;
 
     /**
+     * @var string
+     */
+    protected $emptyText;
+
+    /**
      * @param array $items
      *
      * @return $this
@@ -112,6 +117,18 @@ class Grid
     }
 
     /**
+     * @param string $emptyText
+     *
+     * @return $this
+     */
+    public function setEmptyText($emptyText)
+    {
+        $this->emptyText = $emptyText;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function toHtml()
@@ -171,7 +188,15 @@ class Grid
             }
 
             $html .= '<tr>';
-            $html .= '<td class="text-center" colspan="' . $visibleCols . '">There is data to show</td>';
+            $html .= '<td class="text-center" colspan="' . $visibleCols . '">';
+
+            if ($this->emptyText) {
+                $html .= $this->emptyText;
+            } else {
+                $html .= 'There is data to show';
+            }
+
+            $html .= '</td>';
             $html .= '</tr>';
         }
 
