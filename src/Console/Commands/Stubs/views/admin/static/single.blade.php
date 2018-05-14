@@ -53,7 +53,7 @@
             </div>
 
             <div class="panel-footer panel-default text-right">
-                <a href="{{ route('admin.faq') }}" class="btn btn-default">Go back</a>
+                <a href="{{ route('admin.static') }}" class="btn btn-default">Go back</a>
                 <button class="btn btn-warning">Update</button>
             </div>
         </form>

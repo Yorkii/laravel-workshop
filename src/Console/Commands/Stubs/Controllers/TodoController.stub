@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Admin;
 
 use Yorki\Workshop\Grid\Collection\TodoGrid;
+use App\Models\Todo;
 use App\Managers\Contracts\LinkManagerContract;
 use App\Repositories\Contracts\TodoCommentRepositoryContract;
 use App\Repositories\Contracts\TodoRepositoryContract;

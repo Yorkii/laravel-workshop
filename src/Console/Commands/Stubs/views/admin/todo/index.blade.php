@@ -9,7 +9,7 @@
     <div class="panel panel-warning">
         <div class="panel-heading">
             <div class="panel-control">
-                <span class="badge badge-danger">{{ count($todos) }}</span>
+                <span class="badge badge-danger">{{ $todoCount }}</span>
             </div>
             <h3 class="panel-title">List of things to do</h3>
         </div>
@@ -20,7 +20,7 @@
     <div class="panel panel-success">
         <div class="panel-heading">
             <div class="panel-control">
-                <span class="badge badge-default">{{ count($todosDone) }}</span>
+                <span class="badge badge-default">{{ $todoCountDone }}</span>
             </div>
             <h3 class="panel-title">List of things done</h3>
         </div>

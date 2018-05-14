@@ -119,7 +119,7 @@ class TodoGrid
 
             $html .= '</ul>'
             . '</div> '
-            . '<a href="' . route('admin.static.single', ['id' => $row['id']]) . '" class="btn btn-xs btn-info">See details</a>';
+            . '<a href="' . route('admin.todo.single', ['id' => $row['id']]) . '" class="btn btn-xs btn-info">See details</a>';
 
             return $html;
         });
