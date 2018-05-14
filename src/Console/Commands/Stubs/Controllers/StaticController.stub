@@ -3,7 +3,6 @@
 use Yorki\Workshop\Grid\Collection\StaticPageGrid;
 use App\Managers\Contracts\LinkManagerContract;
 use App\Managers\Contracts\StaticPageManagerContract;
-use App\User;
 use Illuminate\Http\Request;
 use Auth;
 use Validator;
