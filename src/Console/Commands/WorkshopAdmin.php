@@ -134,7 +134,7 @@ class WorkshopAdmin extends Command
         $zip = new \ZipArchive();
 
         if ($zip->open($zipPath)) {
-            //$zip->extractTo(storage_path('admin-lte'));
+            $zip->extractTo(storage_path('admin-lte'));
             $zip->close();
         }
 
@@ -175,6 +175,8 @@ class WorkshopAdmin extends Command
         $this->files->copyDirectory($adminLTERoot . '/bower_components/fastclick/lib', public_path('vendor/fastclick'));
         $this->files->copyDirectory($adminLTERoot . '/bower_components/ckeditor', public_path('vendor/ckeditor'));
         $this->files->copyDirectory($adminLTERoot . '/bower_components/Flot', public_path('vendor/flot'));
+
+        @unlink(storage_path('admin-lte'));
 
         $this->output->success('Admin LTE installed');
     }
