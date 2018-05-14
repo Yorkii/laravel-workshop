@@ -1,6 +1,6 @@
 <?php namespace App\Models;
 
-use App\Models\Contracts\ModelContract;
+use Yorki\Repositories\Contracts\ModelContract;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model implements ModelContract
