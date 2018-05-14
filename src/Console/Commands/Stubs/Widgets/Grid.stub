@@ -1,0 +1,30 @@
+<?php namespace App\Widgets;
+
+use Arrilot\Widgets\AbstractWidget;
+
+class Grid extends AbstractWidget
+{
+    /**
+     * The configuration array.
+     *
+     * @var array
+     */
+    protected $config = [
+        'grid' => null
+    ];
+
+    /**
+     * Treat this method as a controller action.
+     * Return view() or other content to display.
+     */
+    public function run()
+    {
+        if (empty($this->config['grid'])) {
+            return '';
+        }
+
+        return view('widgets.grid', [
+            'config' => $this->config,
+        ]);
+    }
+}

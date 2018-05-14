@@ -2,6 +2,7 @@
 
 use Yorki\Workshop\Console\Commands\WorkshopAdmin;
 use Yorki\Workshop\Console\Commands\WorkshopModel;
+use Yorki\Workshop\Console\Commands\WorkshopStaticpages;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -20,8 +21,12 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             return new WorkshopModel($app['files']);
         });
 
+        $this->app->singleton('command.workshop.static-pages', function ($app) {
+            return new WorkshopStaticpages($app['files']);
+        });
 
         $this->commands('command.workshop.admin');
         $this->commands('command.workshop.model');
+        $this->commands('command.workshop.static-pages');
     }
 }

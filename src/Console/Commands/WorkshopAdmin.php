@@ -61,15 +61,17 @@ class WorkshopAdmin extends Command
         $this->files->copy(__DIR__ . '/Stubs/views/widgets/admin_sidebar.blade.php', base_path('resources/views/widgets/admin_sidebar.blade.php'));
         $this->files->copy(__DIR__ . '/Stubs/Widgets/AdminHeader.stub', base_path('app/Widgets/AdminHeader.php'));
         $this->files->copy(__DIR__ . '/Stubs/views/widgets/admin_header.blade.php', base_path('resources/views/widgets/admin_header.blade.php'));
+        $this->files->copy(__DIR__ . '/Stubs/Widgets/Grid.stub', base_path('app/Widgets/Grid.php'));
+        $this->files->copy(__DIR__ . '/Stubs/views/widgets/grid.blade.php', base_path('resources/views/widgets/grid.blade.php'));
 
         $web = $this->files->get(base_path('routes/web.php'));
 
         if (strpos($web, '[@Admin-Routes@]') === false) {
-            $web .= PHP_EOL . $this->files->get(__DIR__ . '/Stubs/web.stub');
+            $web .= PHP_EOL . $this->files->get(__DIR__ . '/Stubs/routes/web.stub');
             $this->files->put(base_path('routes/web.php'), $web);
         }
 
-        $this->addLinkToSidebar('/admin/users', 'Users');
+        $this->addLinkToSidebar('/admin/user', 'Users');
 
         $adminLTEPath = storage_path('admin-lte-2.4.3.zip');
         $this->downloadAdminLTE($adminLTEPath);

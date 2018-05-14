@@ -1,0 +1,166 @@
+<?php namespace App\Http\Controllers\Admin;
+
+use App\Library\Grid\Collection\StaticPageGrid;
+use App\Managers\Contracts\LinkManagerContract;
+use App\Managers\Contracts\StaticPageManagerContract;
+use App\User;
+use Illuminate\Http\Request;
+use Auth;
+use Validator;
+
+class StaticController extends AdminController
+{
+    /**
+     * @param Request $request
+     * @param StaticPageManagerContract $staticPageManager
+     * @param LinkManagerContract $linkManager
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index(
+        Request $request,
+        StaticPageManagerContract $staticPageManager,
+        LinkManagerContract $linkManager
+    ) {
+        $page = $request->input('page', 1);
+        $pages = $staticPageManager->getAll($page, 10);
+
+        $staticPageGrid = new StaticPageGrid();
+        $staticPageGrid->setItems($pages->toArray());
+
+        return view('admin.static.index', [
+            'currentPage' => $page,
+            'linkManager' => $linkManager,
+            'staticPageGrid' => $staticPageGrid,
+        ]);
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function add()
+    {
+        return view('admin.static.add');
+    }
+
+    /**
+     * @param Request $request
+     * @param StaticPageManagerContract $staticPageManager
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function create(
+        Request $request,
+        StaticPageManagerContract $staticPageManager
+    ) {
+        $this->validate($request, [
+            'title' => 'required',
+            'content' => 'required',
+            'slug' => 'required',
+        ]);
+
+        $slug = strtolower(trim($request->input('slug')));
+
+        if (!$staticPageManager->isSlugCorrect($slug)
+            || $staticPageManager->getBySlug($slug)
+        ) {
+            $validator = Validator::make([], []);
+            $validator->errors()->add('slug', 'Slug is incorrect or already exists');
+
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
+        $staticPageManager->create([
+            'slug' => $slug,
+            'title' => trim($request->input('title')),
+            'content' => trim($request->input('content')),
+        ]);
+
+        return redirect(route('admin.static'));
+    }
+
+    /**
+     * @param StaticPageManagerContract $staticPageManager
+     * @param $staticId
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     */
+    public function single(
+        StaticPageManagerContract $staticPageManager,
+        $staticId
+    ) {
+        $staticPage = $staticPageManager->getById($staticId);
+
+        if (null === $staticPage) {
+            return redirect(route('admin.static'));
+        }
+
+        return view('admin.static.single', [
+            'static' => $staticPage,
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param StaticPageManagerContract $staticPageManager
+     * @param $staticId
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     */
+    public function update(
+        Request $request,
+        StaticPageManagerContract $staticPageManager,
+        $staticId
+    ) {
+        $staticPage = $staticPageManager->getById($staticId);
+
+        if (null === $staticPage) {
+            return redirect(route('admin.static'));
+        }
+
+        $this->validate($request, [
+            'title' => 'required',
+            'content' => 'required',
+            'slug' => 'required',
+        ]);
+
+        $validator = Validator::make([], []);
+
+        $slug = strtolower(trim($request->input('slug')));
+
+        if (!$staticPageManager->isSlugCorrect($slug)) {
+            $validator->errors()->add('slug', 'Slug is incorrect');
+
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
+        if ($staticPageManager->getBySlug($slug) && $staticPage->slug !== $slug) {
+            $validator->errors()->add('slug', 'Slug exists');
+
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
+        $staticPageManager->update($staticId, [
+            'slug' => $slug,
+            'title' => trim($request->input('title')),
+            'content' => trim($request->input('content')),
+        ]);
+
+        return redirect(route('admin.static.single', ['id' => $staticId]));
+    }
+
+    /**
+     * @param StaticPageManagerContract $staticPageManager
+     * @param $staticId
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function delete(
+        StaticPageManagerContract $staticPageManager,
+        $staticId
+    ) {
+        $staticPageManager->delete($staticId);
+
+        return redirect(route('admin.static'));
+    }
+}

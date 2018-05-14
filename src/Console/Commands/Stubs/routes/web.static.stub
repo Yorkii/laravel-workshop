@@ -1,0 +1,24 @@
+    $this->group([
+        'prefix' => 'static',
+    ], function () {
+        $this->get('/', 'StaticController@index')
+            ->name('admin.static');
+
+        $this->get('add', 'StaticController@add')
+            ->name('admin.static.add');
+
+        $this->post('create', 'StaticController@create')
+            ->name('admin.static.create');
+
+        $this->get('show/{id}', 'StaticController@single')
+            ->where('id', '[0-9]+')
+            ->name('admin.static.single');
+
+        $this->post('update/{id}', 'StaticController@update')
+            ->where('id', '[0-9]+')
+            ->name('admin.static.update');
+
+        $this->post('delete/{id}', 'StaticController@delete')
+            ->where('id', '[0-9]+')
+            ->name('admin.static.delete');
+    });
