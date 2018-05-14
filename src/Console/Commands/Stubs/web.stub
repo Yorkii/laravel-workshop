@@ -1,0 +1,9 @@
+//Admin panel routes
+Route::group([
+    'prefix' => 'admin',
+    'namespace' => 'Admin',
+], function () {
+    $this->get('/', 'IndexController@index')->name('admin');
+
+    /* [@Admin-Routes@] */
+});
