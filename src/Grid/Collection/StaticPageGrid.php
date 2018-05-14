@@ -1,4 +1,4 @@
-<?php namespace App\Library\Grid\Collection;
+<?php namespace Yorki\Workshop\Grid\Collection;
 
 use App\Library\Grid\Grid;
 use App\Library\Grid\GridRenderer;
