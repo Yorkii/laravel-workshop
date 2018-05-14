@@ -59,7 +59,7 @@ class WorkshopStaticpages extends WorkshopCommand
      */
     protected function checkDependencies()
     {
-        if (!file_exists(base_path('views/admin/dashboard.blade.php'))) {
+        if (!file_exists(base_path('resources/views/admin/dashboard.blade.php'))) {
             $this->output->error('Admin panel is not installed!');
             $this->output->success('Type "php artisan workshop:admin" to install');
 
