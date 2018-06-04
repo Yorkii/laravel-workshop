@@ -63,12 +63,26 @@ class WorkshopAdmin extends Command
         $this->files->copy(__DIR__ . '/Stubs/views/widgets/admin_header.blade.php', base_path('resources/views/widgets/admin_header.blade.php'));
         $this->files->copy(__DIR__ . '/Stubs/Widgets/Grid.stub', base_path('app/Widgets/Grid.php'));
         $this->files->copy(__DIR__ . '/Stubs/views/widgets/grid.blade.php', base_path('resources/views/widgets/grid.blade.php'));
+        $this->files->copy(__DIR__ . '/Stubs/Middleware/Admin.php', base_path('app/Http/Middleware/Admin.php'));
+        $this->files->copy(__DIR__ . '/Stubs/database/migrations/2018_06_04_172357_add_access_to_user_table.php', base_path('app/database/migrations/2018_06_04_172357_add_access_to_user_table.php'));
 
         $web = $this->files->get(base_path('routes/web.php'));
+        $user = $this->files->get(base_path('app/User.php'));
 
         if (strpos($web, '[@Admin-Routes@]') === false) {
             $web .= PHP_EOL . $this->files->get(__DIR__ . '/Stubs/routes/web.stub');
             $this->files->put(base_path('routes/web.php'), $web);
+        }
+
+        if (strpos($user, 'access') === false) {
+            $fillablePos = strpos($user, '$fillable');
+            $tmp = substr($user, 0, $fillablePos);
+            $rest = substr($user, $fillablePos);
+            $fillablePos = strpos($rest, '\'');
+            $tmp .= substr($rest, 0, $fillablePos);
+            $tmp .= "'access', ";
+            $tmp .= substr($rest, $fillablePos);
+            $this->files->put(base_path('app/User.php'), $tmp);
         }
 
         $this->addLinkToSidebar('/admin/user', 'Users');
